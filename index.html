@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>A Romantic Request</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Elegant continuous heart-pattern background layer */
+            background-color: #3a0a24;
+            background-image: radial-gradient(rgba(255, 77, 109, 0.15) 1px, transparent 0),
+                              radial-gradient(rgba(255, 77, 109, 0.15) 1px, transparent 0);
+            background-size: 24px 24px;
+            background-position: 0 0, 12px 12px;
+            font-family: 'Georgia', serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Glassmorphic container box */
+        .container {
+            text-align: center;
+            background: rgba(20, 5, 15, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 3rem 2rem;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            max-width: 400px;
+            width: 90%;
+            transition: all 0.5s ease;
+            position: relative;
+            z-index: 10;
+        }
+
+        .heart-icon {
+            font-size: 4.5rem;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            animation: pulse 1.2s infinite alternate cubic-bezier(0.215, 0.610, 0.355, 1);
+            filter: drop-shadow(0 0 10px rgba(255, 77, 109, 0.6));
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.12); }
+        }
+
+        h1 {
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(255, 77, 109, 0.5);
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            font-weight: normal;
+        }
+
+        p {
+            color: #ffd3e0;
+            font-size: 1.1rem;
+            margin-bottom: 2.5rem;
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            min-height: 60px;
+            position: relative;
+        }
+
+        button {
+            padding: 12px 28px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            touch-action: manipulation;
+        }
+
+        #yes-btn {
+            background: linear-gradient(45deg, #ff4d6d, #ff758f);
+            color: white;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        #yes-btn:active {
+            transform: scale(0.95);
+        }
+
+        #no-btn {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            /* Important style configuration for smooth jumping */
+            position: relative; 
+            z-index: 100;
+        }
+
+        /* Floating Falling Hearts Animation elements */
+        .heart-fall {
+            position: absolute;
+            color: rgba(255, 77, 109, 0.6);
+            font-size: 24px;
+            user-select: none;
+            pointer-events: none;
+            animation: floatUp 4s linear forwards;
+            z-index: 1;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(105vh) scale(0) rotate(0deg);
+                opacity: 0;
+            }
+            15% { opacity: 1; }
+            90% { opacity: 1; }
+            100% {
+                transform: translateY(-10vh) scale(1.4) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="main-card">
+        <div class="heart-icon" id="main-emoji">❤️</div>
+        
+        <h1 id="headline">From the moment we met...</h1>
+        <p id="subtext">Will you make me the happiest person and be mine?</p>
+
+        <div class="btn-group">
+            <button id="yes-btn" onclick="celebrate()">Yes</button>
+            <button id="no-btn" 
+                    onmouseover="handleNoInteraction(event)" 
+                    ontouchstart="handleNoInteraction(event)" 
+                    onclick="handleNoInteraction(event)">No</button>
+        </div>
+    </div>
+
+    <script>
+        let missCount = 0;
+        let heartInterval;
+
+        function handleNoInteraction(e) {
+            // Stop phone browser click emulation events from double-triggering
+            e.preventDefault(); 
+            
+            missCount++;
+            
+            if (missCount >= 4) {
+                document.getElementById('no-btn').style.display = 'none';
+                startHeartRain();
+                return;
+            }
+
+            moveNoButton();
+        }
+
+        function moveNoButton() {
+            const noBtn = document.getElementById('no-btn');
+            
+            // Set safety limits to prevent button clipping outside visible phone edge
+            const padding = 80;
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - padding) + (padding / 2);
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - padding) + (padding / 2);
+            
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = x + 'px';
+            noBtn.style.top = y + 'px';
+        }
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart-fall');
+            heart.innerHTML = '❤️';
+            
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = (Math.random() * 2 + 2.5) + 's'; 
+            heart.style.fontSize = (Math.random() * 20 + 16) + 'px'; 
+            
+            document.body.appendChild(heart);
+
+            setTimeout(() => {
+                heart.remove();
+            }, 4500);
+        }
+
+        function startHeartRain() {
+            if (!heartInterval) {
+                heartInterval = setInterval(createHeart, 150); // Faster hearts for video effect
+            }
+        }
+
+        function celebrate() {
+            const headline = document.getElementById('headline');
+            const subtext = document.getElementById('subtext');
+            const emoji = document.getElementById('main-emoji');
+            const noBtn = document.getElementById('no-btn');
+            const yesBtn = document.getElementById('yes-btn');
+            const card = document.getElementById('main-card');
+
+            startHeartRain();
+
+            headline.innerText = "Forever Yours ❤️";
+            subtext.innerText = "You've made my entire world complete.";
+            emoji.innerText = "🥰💖✨";
+            
+            noBtn.style.display = 'none';
+            yesBtn.style.transform = 'scale(1.1)';
+            yesBtn.innerText = "Thank You!";
+            
+            card.style.background = "rgba(40, 10, 25, 0.85)";
+            card.style.boxShadow = "0 20px 50px rgba(255, 77, 109, 0.4)";
+        }
+    </script>
+</body>
+</html>
